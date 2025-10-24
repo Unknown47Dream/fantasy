@@ -1,5 +1,3 @@
-
-
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
@@ -11,7 +9,31 @@ datasource db {
 }
 
 model User {
-  id    Int     @default(autoincrement()) @id
-  email String  @unique
-  username  String?
+  id            Int             @id @default(autoincrement())
+  email         String          @unique @db.VarChar(300)
+  username      String?
+  points        Int             @default(0)
+  pointsHistory PointsHistory[]
+  created_at    DateTime        @default(now())
+  updated_at    DateTime        @updatedAt
+
+  @@index([id, created_at(sort: Desc)])
+  @@map("users")
+}
+
+model PointsHistory {
+  id          Int              @id @default(autoincrement())
+  amount      Int
+  type        PointHistoryType @default(DAILY)
+  description String?          @db.VarChar(255)
+  created_at  DateTime         @default(now())
+  user        User             @relation(fields: [userId], references: [id])
+  userId      Int
+
+  @@index([userId, created_at(sort: Desc)])
+  @@map("points_history")
+}
+
+enum PointHistoryType {
+  DAILY
 }
