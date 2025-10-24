@@ -12,13 +12,25 @@ model User {
   id            Int             @id @default(autoincrement())
   email         String          @unique @db.VarChar(300)
   username      String?
+  level         Int             @default(1)
   points        Int             @default(0)
   pointsHistory PointsHistory[]
+  dailyStreaks  DailyStreaks?
   created_at    DateTime        @default(now())
   updated_at    DateTime        @updatedAt
 
   @@index([id, created_at(sort: Desc)])
   @@map("users")
+}
+
+model DailyStreaks {
+  id          Int      @id @default(autoincrement())
+  user        User     @relation(fields: [userId], references: [id])
+  userId      Int      @unique
+  streakCount Int      @default(0)
+  lastUpdate  DateTime @default(now())
+
+  @@map("daily_streaks")
 }
 
 model PointsHistory {
@@ -36,4 +48,5 @@ model PointsHistory {
 
 enum PointHistoryType {
   DAILY
+  PURCHASE
 }
