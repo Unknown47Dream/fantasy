@@ -9,28 +9,32 @@ datasource db {
 }
 
 model User {
-  id            Int             @id @default(autoincrement())
-  email         String          @unique @db.VarChar(300)
-  username      String?
-  level         Int             @default(1)
-  points        Int             @default(0)
-  pointsHistory PointsHistory[]
-  dailyStreaks  DailyStreaks?
-  created_at    DateTime        @default(now())
-  updated_at    DateTime        @updatedAt
+  id                      Int             @id @default(autoincrement())
+  telegramId              String          @unique @db.VarChar(255)
+  username                String?         @db.VarChar(255)
+  firstName               String?         @db.VarChar(255)
+  lastName                String?         @db.VarChar(255)
+  photoUrl                String?
+  languageCode            String?         @db.VarChar(10)
+  isPremium               Boolean         @default(false)
+  level                   Int             @default(1)
+  points                  Int             @default(0)
+  pointsHistory           PointsHistory[]
+  referralCode            String          @unique
+  referredBy              String?
+  referralCount           Int             @default(0)
+  lastDailyClaimAt        DateTime?
+  dailyStreak             Int             @default(0)
+  walletAddress           String?
+  walletConnectedAt       DateTime?
+  paymentWalletAddress    String?
+  paymentWalletVerified   Boolean         @default(false)
+  paymentWalletVerifiedAt DateTime?
+  createdAt               DateTime        @default(now())
+  updatedAt               DateTime        @updatedAt
 
-  @@index([id, created_at(sort: Desc)])
+  @@index([id, createdAt(sort: Desc)])
   @@map("users")
-}
-
-model DailyStreaks {
-  id          Int      @id @default(autoincrement())
-  user        User     @relation(fields: [userId], references: [id])
-  userId      Int      @unique
-  streakCount Int      @default(0)
-  lastUpdate  DateTime @default(now())
-
-  @@map("daily_streaks")
 }
 
 model PointsHistory {
