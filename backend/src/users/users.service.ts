@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { User, Prisma, PointHistoryType } from 'generated/prisma/client';
+import { User, Prisma } from 'generated/prisma/client';
 import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
@@ -54,21 +54,8 @@ export class UsersService {
     });
   }
 
-  async updateUserPoints(
-    userId: number,
-    amount: number,
-    type: PointHistoryType,
-    description?: string,
-  ) {
+  async updateUserPoints(userId: string, amount: number) {
     await this.prisma.$transaction(async (tx) => {
-      await tx.pointsHistory.create({
-        data: {
-          userId,
-          amount,
-          type,
-          description,
-        },
-      });
       await tx.user.update({
         where: { id: userId },
         data: {

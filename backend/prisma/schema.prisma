@@ -9,48 +9,104 @@ datasource db {
 }
 
 model User {
-  id                      Int             @id @default(autoincrement())
-  telegramId              String          @unique @db.VarChar(255)
-  username                String?         @db.VarChar(255)
-  firstName               String?         @db.VarChar(255)
-  lastName                String?         @db.VarChar(255)
-  photoUrl                String?
-  languageCode            String?         @db.VarChar(10)
-  isPremium               Boolean         @default(false)
-  level                   Int             @default(1)
-  points                  Int             @default(0)
-  pointsHistory           PointsHistory[]
-  referralCode            String          @unique
-  referredBy              String?
-  referralCount           Int             @default(0)
+  id                      String     @id @default(cuid()) @db.VarChar(128)
+  telegramId              String     @unique @db.VarChar(255)
+  username                String?    @db.VarChar(255)
+  firstName               String?    @db.VarChar(255)
+  lastName                String?    @db.VarChar(255)
+  photoUrl                String?    @db.Text
+  languageCode            String?    @db.VarChar(10)
+  isPremium               Boolean    @default(false)
+  points                  Int        @default(0)
+  level                   Int        @default(1)
+  // Referral system (Self-relation)
+  referralCode            String     @unique @db.VarChar(50)
+  referralCount           Int        @default(0)
+  referredById            String?    @db.VarChar(128)
+  referredBy              User?      @relation("UserReferrals", fields: [referredById], references: [id], onDelete: SetNull)
+  referrals               User[]     @relation("UserReferrals")
+  referralsMade           Referral[] @relation("ReferrerReferrals")
+  referralsReceived       Referral[] @relation("ReferredReferrals")
+  // purchases
+  purchases               Purchase[]
+  // Daily bonus
   lastDailyClaimAt        DateTime?
-  dailyStreak             Int             @default(0)
-  walletAddress           String?
+  dailyStreak             Int        @default(0)
+  // Airdrop wallet
+  walletAddress           String?    @db.VarChar(255)
   walletConnectedAt       DateTime?
-  paymentWalletAddress    String?
-  paymentWalletVerified   Boolean         @default(false)
+  // Payment wallet (TON Connect)
+  paymentWalletAddress    String?    @db.VarChar(255)
+  paymentWalletVerified   Boolean    @default(false)
   paymentWalletVerifiedAt DateTime?
-  createdAt               DateTime        @default(now())
-  updatedAt               DateTime        @updatedAt
+  createdAt               DateTime   @default(now())
+  updatedAt               DateTime   @default(now()) @updatedAt
 
-  @@index([id, createdAt(sort: Desc)])
+  @@index([telegramId], name: "user_telegram_id_idx")
+  @@index([referralCode], name: "user_referral_code_idx")
+  @@index([points(sort: Desc), createdAt(sort: Asc)], name: "user_leaderboard_idx")
+  @@index([paymentWalletAddress], name: "user_payment_wallet_idx")
   @@map("users")
 }
 
-model PointsHistory {
-  id          Int              @id @default(autoincrement())
-  amount      Int
-  type        PointHistoryType @default(DAILY)
-  description String?          @db.VarChar(255)
-  created_at  DateTime         @default(now())
-  user        User             @relation(fields: [userId], references: [id])
-  userId      Int
+model Purchase {
+  id                      String                @id @default(cuid()) @db.VarChar(128)
+  userId                  String                @db.VarChar(128)
+  user                    User                  @relation(fields: [userId], references: [id])
+  type                    PurchaseType
+  amount                  Int                   @default(0)
+  price                   Decimal?              @db.Decimal(20, 9)
+  currency                PurchaseCurrencyType?
+  // Telegram Stars payment fields
+  telegramPaymentChargeId String?               @unique @db.VarChar(255)
+  invoicePayload          Json?
+  // TON payment fields
+  tonTransactionHash      String?               @unique @db.VarChar(255)
+  tonFromAddress          String?               @db.VarChar(255)
+  tonAmount               Decimal?              @db.Decimal(20, 9)
+  tonVerifiedAt           DateTime?
+  status                  PurchaseStatus        @default(PENDING)
+  createdAt               DateTime              @default(now())
+  completedAt             DateTime?
 
-  @@index([userId, created_at(sort: Desc)])
-  @@map("points_history")
+  @@index([userId], name: "purchase_user_idx")
+  @@index([status], name: "purchase_status_idx")
+  @@index([type], name: "purchase_type_idx")
+  @@index([telegramPaymentChargeId], name: "purchase_telegram_payment_idx")
+  @@index([tonTransactionHash], name: "purchase_ton_hash_idx")
+  @@index([tonFromAddress], name: "purchase_ton_address_idx")
+  @@map("purchases")
 }
 
-enum PointHistoryType {
-  DAILY
-  PURCHASE
+enum PurchaseCurrencyType {
+  STARS
+  TON
+}
+
+enum PurchaseType {
+  TELEGRAM_STARS
+  TON_PAYMENT
+}
+
+enum PurchaseStatus {
+  PENDING
+  COMPLETED
+  REFUNDED
+  FAILED
+}
+
+model Referral {
+  id           String   @id @default(cuid()) @db.VarChar(128)
+  referrerId   String   @db.VarChar(128)
+  referrer     User     @relation("ReferrerReferrals", fields: [referrerId], references: [id])
+  referredId   String   @db.VarChar(128)
+  referred     User     @relation("ReferredReferrals", fields: [referredId], references: [id])
+  codeUsed     String?
+  pointsAmount Int      @default(1000)
+  claimedAt    DateTime @default(now())
+
+  @@unique([referrerId, referredId], name: "referral_unique")
+  @@index([referrerId], name: "referral_referrer_idx")
+  @@index([referredId], name: "referral_referred_idx")
+  @@map("referrals")
 }
