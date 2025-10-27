@@ -1,13 +1,8 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import type { User } from "@/lib/db/schema";
-import { MainSection } from "@/components/MainSection";
-import { BottomNav } from "@/components/BottomNav";
-import { ReferralSection } from "@/components/ReferralSection";
-import { LeaderboardSection } from "@/components/LeaderboardSection";
-import { ShopSection } from "@/components/ShopSection";
-import { WalletSection } from "@/components/WalletSection";
+import { init, miniApp, viewport, retrieveRawInitData } from "@telegram-apps/sdk";
+import axios from "axios";
 
 type Page = "main" | "referral" | "leaderboard" | "buy" | "wallet";
 
@@ -16,55 +11,36 @@ export default function Home() {
   const authAttempted = useRef(false);
 
   useEffect(() => {
-    const initApp = async () => {
-      // Prevent double initialization
-      if (authAttempted.current) return;
-      authAttempted.current = true;
+    if (authAttempted.current) return;
+    authAttempted.current = true;
+    const setupApp = async () => {
       try {
-        const WebApp = (await import("@twa-dev/sdk")).default;
-        WebApp.ready();
-        WebApp.expand();
-        WebApp.setHeaderColor("#3498DB");
-        WebApp.setBackgroundColor("#aac3ff");
-        await new Promise((resolve) => setTimeout(resolve, 100));
-        if (WebApp.initData) {
-          const referralCode = WebApp.initDataUnsafe?.start_param || null;
-          try {
-            const response = await fetch("/api/auth/telegram", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                initData: WebApp.initData,
-                referralCode,
-              }),
-            });
-            if (response.ok) {
-              const data = await response.json();
-              // setUser(data.user);
-              // setPoints(data.user.points);
-              if (data.isNewUser && referralCode) {
-                setTimeout(() => {
-                  // showToast("🎉 Welcome! You got bonus points for joining!");
-                }, 500);
-              }
-            } else {
-              console.error("Auth failed:", response.status);
-              // showToast("Authentication failed. Please refresh.");
-            }
-          } catch (error) {
-            console.error("Auth error:", error);
-            // showToast("Connection error. Please check your internet.");
-          }
+        init();
+        miniApp.ready();
+        viewport.expand();
+        const initDataRaw = retrieveRawInitData();
+        const res = await axios.post("/api/auth/telegram", null, {
+          headers: {
+            Authorization: `tma ${initDataRaw}`,
+          },
+        });
+        if (res.status === 200) {
+          console.log(res.data);
+          // setUser(data.user);
+          // setPoints(data.user.points);
+          // if (data.isNewUser && referralCode) {
+          // showToast("🎉 Welcome! You got bonus points for joining!");
+          // }
         } else {
-          console.log("No Telegram WebApp data");
+          console.error("Authentication failed");
+          // showToast("Authentication failed. Please refresh.");
         }
       } catch (error) {
-        console.error("Init error:", error);
-      } finally {
-        // setLoading(false);
+        console.error("Setup failed:", error);
+        // showToast("Authentication failed. Please refresh.");
       }
     };
-    initApp();
+    setupApp();
   }, []);
 
   useEffect(() => {
