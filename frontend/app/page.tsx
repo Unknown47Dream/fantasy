@@ -2,13 +2,15 @@
 
 import { useEffect, useState, useRef } from "react";
 import { init, miniApp, viewport, retrieveRawInitData } from "@telegram-apps/sdk";
-import axios from "axios";
+import { useGetUser } from "@/hooks/use-get-user";
 
-type Page = "main" | "referral" | "leaderboard" | "buy" | "wallet";
+type Page = "MAIN" | "REFERRAL" | "LEADERBOARD" | "SHOP" | "WALLET";
 
 export default function Home() {
-  const [currentPage, setCurrentPage] = useState<Page>("main");
+  const [currentPage, setCurrentPage] = useState<Page>("MAIN");
+  const [initData, setInitData] = useState("");
   const authAttempted = useRef(false);
+  const getUser = useGetUser(initData);
 
   useEffect(() => {
     if (authAttempted.current) return;
@@ -19,21 +21,8 @@ export default function Home() {
         miniApp.ready();
         viewport.expand();
         const initDataRaw = retrieveRawInitData();
-        const res = await axios.post("/api/auth/telegram", null, {
-          headers: {
-            Authorization: `tma ${initDataRaw}`,
-          },
-        });
-        if (res.status === 200) {
-          console.log(res.data);
-          // setUser(data.user);
-          // setPoints(data.user.points);
-          // if (data.isNewUser && referralCode) {
-          // showToast("🎉 Welcome! You got bonus points for joining!");
-          // }
-        } else {
-          console.error("Authentication failed");
-          // showToast("Authentication failed. Please refresh.");
+        if (initDataRaw) {
+          setInitData(initDataRaw);
         }
       } catch (error) {
         console.error("Setup failed:", error);

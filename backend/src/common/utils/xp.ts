@@ -74,3 +74,41 @@ export function getStreakXp(
     throw new Error('Invalid formula type. Use "linear" or "quadratic".');
   }
 }
+
+/**
+ * Calculates the minimum XP required to reach a specific level.
+ * This is the threshold XP where the user enters that level.
+ * @param level The target level (e.g., 3)
+ * @returns The min XP to reach that level (e.g., 800 for level 3)
+ */
+export function getMinXpForLevel(level: number): number {
+  if (level < 1) throw new Error('Level must be at least 1');
+  return BASE_XP_PER_LEVEL * Math.pow(level - 1, LEVEL_EXPONENT);
+}
+
+/**
+ * Calculates the XP range (min and max) for a specific level.
+ * Max is the XP just before entering the next level.
+ * @param level The target level (e.g., 3)
+ * @returns { min: number, max: number } (e.g., { min: 800, max: 2699 } for level 3)
+ */
+export function getXpRangeForLevel(level: number): {
+  min: number;
+  max: number;
+} {
+  const min = getMinXpForLevel(level);
+  const nextMin = getMinXpForLevel(level + 1);
+  return { min, max: nextMin - 1 };
+}
+
+/**
+ * Gets the minimum XP threshold for the next level based on current XP.
+ * This is the total XP needed to reach the next level (not the remaining).
+ * @param xp Current total XP
+ * @returns The min XP for the next level (e.g., 800 if current level is 2)
+ */
+export function getNextLevelThreshold(xp: number): number {
+  if (xp < 0) throw new Error('XP cannot be negative');
+  const currentLevel = getCurrentLevel(xp);
+  return getMinXpForLevel(currentLevel + 1);
+}

@@ -15,20 +15,35 @@ export class UsersService {
   }
 
   async getUsers(params: {
-    skip?: number;
+    page?: number;
     take?: number;
     cursor?: Prisma.UserWhereUniqueInput;
     where?: Prisma.UserWhereInput;
     orderBy?: Prisma.UserOrderByWithRelationInput;
-  }): Promise<User[]> {
-    const { skip, take, cursor, where, orderBy } = params;
-    return this.prisma.user.findMany({
-      skip,
-      take,
-      cursor,
-      where,
-      orderBy,
-    });
+  }): Promise<{
+    users: User[];
+    total: number;
+    page: number;
+    totalPages: number;
+  }> {
+    const { page = 1, take = 10, cursor, where, orderBy } = params;
+    const skip = (page - 1) * take;
+    const [users, total] = await this.prisma.$transaction([
+      this.prisma.user.findMany({
+        skip,
+        take,
+        cursor,
+        where,
+        orderBy,
+      }),
+      this.prisma.user.count({ where }),
+    ]);
+    return {
+      users,
+      total,
+      page,
+      totalPages: Math.ceil(total / take),
+    };
   }
 
   async createUser(data: Prisma.UserCreateInput): Promise<User> {

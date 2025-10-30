@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { TonProvider } from "@/providers/ton-provider";
+import Providers from "./providers";
 
 // Configure Fredoka font
 const inter = Inter({
@@ -27,7 +28,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className={`${inter.className} overflow-x-hidden antialiased`}>
-        <TonProvider>{children}</TonProvider>
+        <Providers>
+          <TonProvider>{children}</TonProvider>
+        </Providers>
       </body>
     </html>
   );

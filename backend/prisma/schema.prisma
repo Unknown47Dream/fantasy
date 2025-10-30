@@ -18,7 +18,8 @@ model User {
   languageCode            String?    @db.VarChar(10)
   isPremium               Boolean    @default(false)
   points                  Int        @default(0)
-  level                   Int        @default(1)
+  xp                      Int        @default(0)
+  tasks                   UserTask[]
   // Referral system (Self-relation)
   referralCode            String     @unique @db.VarChar(50)
   referralCount           Int        @default(0)
@@ -109,4 +110,32 @@ model Referral {
   @@index([referrerId], name: "referral_referrer_idx")
   @@index([referredId], name: "referral_referred_idx")
   @@map("referrals")
+}
+
+model UserTask {
+  id          String    @id @default(cuid()) @db.VarChar(128)
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  taskId      String
+  task        Task      @relation(fields: [taskId], references: [id])
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+
+  @@unique([userId, taskId])
+  @@index([userId], name: "user_task_user_idx")
+  @@index([taskId], name: "user_task_task_idx")
+  @@index([completed], name: "user_task_completed_idx")
+  @@map("user_tasks")
+}
+
+model Task {
+  id        String     @id @default(cuid()) @db.VarChar(128)
+  type      String
+  target    String
+  reward    Int
+  userTasks UserTask[]
+
+  @@index([type], name: "task_type_idx")
+  @@index([target], name: "task_target_idx")
+  @@map("tasks")
 }
