@@ -2,6 +2,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 // import { ThrottlerBehindProxyGuard } from './common/guards/throttler-behind-proxy.guard';
 
@@ -26,6 +27,7 @@ import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
       },
     ]),
     UsersModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [
