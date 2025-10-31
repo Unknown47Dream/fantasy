@@ -1,0 +1,284 @@
+export interface Dota2PlayerTournamentStats {
+  active: boolean;
+  age: number;
+  birthday: string;
+  current_team: null;
+  current_videogame: Currentvideogame;
+  favorite_heroes: Favoritehero[];
+  first_name: string;
+  id: number;
+  image_url: string;
+  last_games: Lastgame[];
+  last_name: string;
+  modified_at: string;
+  name: string;
+  nationality: string;
+  role: string;
+  slug: string;
+  stats: Stats;
+  teams: Team[];
+}
+
+interface Team {
+  acronym: null | string;
+  id: number;
+  image_url: null | string;
+  location: null | string;
+  modified_at: string;
+  name: string;
+  slug: string;
+}
+
+interface Stats {
+  averages: Averages;
+  games_count: number;
+  totals: Totals;
+  tournament: Tournament;
+}
+
+interface Tournament {
+  begin_at: string;
+  country: null;
+  detailed_stats: boolean;
+  end_at: string;
+  expected_roster: Expectedroster[];
+  has_bracket: boolean;
+  id: number;
+  league: League;
+  league_id: number;
+  live_supported: boolean;
+  matches: Match[];
+  modified_at: string;
+  name: string;
+  prizepool: null;
+  region: null;
+  serie: Serie;
+  serie_id: number;
+  slug: string;
+  teams: Opponent[];
+  tier: null;
+  type: null;
+  videogame: Currentvideogame;
+  videogame_title: null;
+  winner_id: null;
+  winner_type: string;
+}
+
+interface Serie {
+  begin_at: string;
+  end_at: string;
+  full_name: string;
+  id: number;
+  league_id: number;
+  modified_at: string;
+  name: string;
+  season: null;
+  slug: string;
+  winner_id: number;
+  winner_type: string;
+  year: number;
+}
+
+interface Match {
+  begin_at: string;
+  detailed_stats: boolean;
+  draw: boolean;
+  end_at: string;
+  forfeit: boolean;
+  game_advantage: null;
+  id: number;
+  live: Live;
+  match_type: string;
+  modified_at: string;
+  name: string;
+  number_of_games: number;
+  original_scheduled_at: string;
+  rescheduled: boolean;
+  scheduled_at: string;
+  slug: string;
+  status: string;
+  streams_list: any[];
+  tournament_id: number;
+  winner_id: null | number;
+  winner_type: string;
+}
+
+interface Live {
+  opens_at: string;
+  supported: boolean;
+  url: string;
+}
+
+interface League {
+  id: number;
+  image_url: null;
+  modified_at: string;
+  name: string;
+  slug: string;
+  url: null;
+}
+
+interface Expectedroster {
+  players: Player[];
+  team: Opponent;
+}
+
+interface Totals {
+  assists: number;
+  deaths: number;
+  games_lost: number;
+  games_played: number;
+  games_won: number;
+  kills: number;
+  matches_draw: number;
+  matches_lost: number;
+  matches_played: number;
+  matches_won: number;
+  observer_wards_destroyed: number;
+  observer_wards_placed: number;
+  sentry_wards_destroyed: number;
+  sentry_wards_placed: number;
+  tower_kills: number;
+}
+
+interface Averages {
+  assists: number;
+  camps_stacked: number;
+  camps_stacked_per_minute: number;
+  creeps_stacked: number;
+  creeps_stacked_per_minute: number;
+  crowd_control_per_minute: number;
+  damage_taken: null;
+  deaths: number;
+  denies: number;
+  denies_per_minute: number;
+  gold_per_minute: number;
+  gold_percentage: number;
+  heal: number;
+  hero_damage: number;
+  hero_damage_per_minute: number;
+  hero_damage_percentage: number;
+  hero_healing_per_minute: number;
+  kill_participation: number;
+  kills: number;
+  lane_creep: number;
+  last_hits: number;
+  last_hits_per_minute: number;
+  net_worth: number;
+  neutral_creep: number;
+  observer_wards_destroyed: number;
+  observer_wards_placed: number;
+  observer_wards_purchased: number;
+  sentry_wards_destroyed: number;
+  sentry_wards_placed: number;
+  sentry_wards_purchased: number;
+  tower_damage: number;
+  tower_damage_per_minute: number;
+  tower_kills: number;
+  wards_placed: number;
+  wards_placed_per_minute: number;
+  xp_per_minute: number;
+}
+
+interface Lastgame {
+  abilities: Ability[];
+  assists: number;
+  camps_stacked: number;
+  creeps_stacked: number;
+  damage_taken: null;
+  deaths: number;
+  denies: number;
+  faction: string;
+  game_id: number;
+  gold_per_min: number;
+  gold_remaining: number;
+  gold_spent: number;
+  heal: number;
+  hero: Hero;
+  hero_damage: number;
+  hero_level: number;
+  items: Item[];
+  kills: number;
+  lane_creep: number;
+  last_hits: number;
+  net_worth: null | number;
+  neutral_creep: number;
+  observer_used: number;
+  observer_wards_destroyed: number;
+  observer_wards_purchased: number;
+  opponent: Opponent;
+  player: Player;
+  role: null | number;
+  sentry_used: number;
+  sentry_wards_destroyed: number;
+  sentry_wards_purchased: number;
+  team_id: number;
+  tower_damage: number;
+  tower_kills: number;
+  xp_per_min: number;
+}
+
+interface Player {
+  active: boolean;
+  age: number;
+  birthday: string;
+  first_name: string;
+  id: number;
+  image_url: string;
+  last_name: string;
+  modified_at: string;
+  name: string;
+  nationality: string;
+  role: string;
+  slug: string;
+}
+
+interface Opponent {
+  acronym: string;
+  id: number;
+  image_url: string;
+  location: string;
+  modified_at: string;
+  name: string;
+  slug: string;
+}
+
+interface Item {
+  id: number;
+  image_url: string;
+  name: string;
+}
+
+interface Ability {
+  id: number;
+  image_url: null | string;
+  level: number;
+  name: string;
+}
+
+interface Favoritehero {
+  games_count: number;
+  games_lost: number;
+  games_won: number;
+  hero: Hero;
+  most_used_items: Mostuseditem[];
+}
+
+interface Mostuseditem {
+  count: number;
+  id: number;
+  name: string;
+}
+
+interface Hero {
+  id: number;
+  image_url: string;
+  localized_name: string;
+  name: string;
+}
+
+interface Currentvideogame {
+  id: number;
+  name: string;
+  slug: string;
+}

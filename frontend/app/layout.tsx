@@ -2,7 +2,9 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { TonProvider } from "@/providers/ton-provider";
-import Providers from "./providers";
+import { ThemeProvider } from "@/providers/theme-provider";
+import TanstackProviders from "./tanstack-providers";
+import { Toaster } from "@/components/ui/sonner";
 
 // Configure Fredoka font
 const inter = Inter({
@@ -26,11 +28,19 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} overflow-x-hidden antialiased`}>
-        <Providers>
-          <TonProvider>{children}</TonProvider>
-        </Providers>
+        <TanstackProviders>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <TonProvider>{children}</TonProvider>
+            <Toaster />
+          </ThemeProvider>
+        </TanstackProviders>
       </body>
     </html>
   );

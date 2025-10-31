@@ -9,6 +9,15 @@ async function bootstrap() {
   app.set('trust proxy', 1);
   app.useGlobalFilters(new PrismaExceptionFilter());
   app.useGlobalPipes(new ValidationPipe());
+  app.setGlobalPrefix('api');
+  // app.enableShutdownHooks();
+  // if (process.env.NODE_ENV === 'development') {
+  //   app.enableCors({
+  //     origin: 'http://localhost:5173', // Vite default port
+  //     credentials: true,
+  //   });
+  //   console.log('CORS enabled for development');
+  // }
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

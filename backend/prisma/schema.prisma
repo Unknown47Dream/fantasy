@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../generated/prisma"
 }
 
@@ -52,7 +52,9 @@ model User {
   languageCode            String?    @db.VarChar(10)
   isPremium               Boolean    @default(false)
   points                  Int        @default(0)
+  pointsHistory           PointsHistory[]
   xp                      Int        @default(0)
+  xpHistory               XpHistory[]
   tasks                   UserTask[]
   // Referral system (Self-relation)
   referralCode            String     @unique @db.VarChar(50)
@@ -64,6 +66,7 @@ model User {
   referralsReceived       Referral[] @relation("ReferredReferrals")
   // purchases
   purchases               Purchase[]
+  // Points history
   // Daily bonus
   lastDailyClaimAt        DateTime?
   dailyStreak             Int        @default(0)
@@ -82,6 +85,57 @@ model User {
   @@index([points(sort: Desc), createdAt(sort: Asc)], name: "user_leaderboard_idx")
   @@index([paymentWalletAddress], name: "user_payment_wallet_idx")
   @@map("users")
+}
+
+model XpHistory {
+  id          String   @id @default(cuid()) @db.VarChar(128)
+  userId      String   @db.VarChar(128)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type        XpType
+  amount      Int
+  description String?  @db.VarChar(500)
+  createdAt   DateTime @default(now())
+
+  @@index([userId], name: "xp_history_user_idx")
+  @@index([type], name: "xp_history_type_idx")
+  @@index([createdAt(sort: Desc)], name: "xp_history_created_at_idx")
+  @@map("xp_history")
+}
+
+enum XpType {
+  MATCH_PARTICIPATION
+  MATCH_WIN
+  MATCH_LOSS
+  ACHIEVEMENT
+  DAILY_BONUS
+  TASK_COMPLETION
+  REFERRAL
+  PURCHASE_BONUS
+  ADMIN_ADJUSTMENT
+}
+
+model PointsHistory {
+  id          String     @id @default(cuid()) @db.VarChar(128)
+  userId      String     @db.VarChar(128)
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type        PointsType
+  amount      Int
+  description String?    @db.VarChar(500)
+  createdAt   DateTime   @default(now())
+
+  @@index([userId], name: "points_history_user_idx")
+  @@index([type], name: "points_history_type_idx")
+  @@index([createdAt(sort: Desc)], name: "points_history_created_at_idx")
+  @@map("points_history")
+}
+
+enum PointsType {
+  DAILY
+  REFERRAL
+  TASK_COMPLETION
+  PURCHASE
+  BONUS
+  ADMIN_ADJUSTMENT
 }
 
 model Purchase {
