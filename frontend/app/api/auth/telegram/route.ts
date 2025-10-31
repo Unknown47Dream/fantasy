@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
     );
   }
   try {
-    const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users`, {
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/user`, {
       headers: {
         Authorization: authHeader,
       },

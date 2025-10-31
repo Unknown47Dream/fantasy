@@ -35,6 +35,39 @@ export class UsersService {
         cursor,
         where,
         orderBy,
+        include: {
+          xpHistory: {
+            orderBy: { createdAt: 'desc' },
+            take: 10, // Limit for performance
+          },
+          pointsHistory: {
+            orderBy: { createdAt: 'desc' },
+            take: 10,
+          },
+          purchases: {
+            orderBy: { createdAt: 'desc' },
+            take: 10,
+          },
+          referrals: {
+            orderBy: { createdAt: 'desc' },
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              username: true,
+              photoUrl: true,
+              points: true,
+              xp: true,
+              createdAt: true,
+            },
+            take: 10,
+          },
+          tasks: {
+            include: {
+              task: true,
+            },
+          },
+        },
       }),
       this.prisma.user.count({ where }),
     ]);
