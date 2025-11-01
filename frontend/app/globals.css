@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --font-primary: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial,
+  --font-primary: var(--font-ibm), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial,
     sans-serif;
   --radius: 0.625rem;
   --background: oklch(1 0 0);
@@ -149,5 +149,78 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@theme {
+  --color-brand-background-1: #091326;
+  --color-brand-background-2: #212c42;
+  --color-brand-background-3: #212c4266;
+  --color-brand-background-4: #49afe914;
+  --color-brand-background-5: #16213626;
+  --color-brand-background-hover-1: #49afe926;
+  --color-brand-background-hover-2: #35435c;
+  --color-brand-font-1: #98b0c1;
+  --color-brand-font-2: #d1d1d2;
+  --color-brand-font-3: #5f7183;
+  --color-brand-font-4: #49afe9;
+  --color-brand-border: #ffffff14;
+  --color-brand-orange-font: #ffa318;
+  --color-brand-orange-background: #ffa31826;
+  --color-brand-green-font: #30d69a;
+  --color-brand-green-background: #30d69a26;
+  --color-brand-red-font: #e84860;
+  --color-brand-red-background: #e8486026;
+  --color-brand-blue-background: #49afe940;
+  --color-brand-blue-background-gradient: radial-gradient(
+    161.25% 161.25% at 50.4%,
+    #49afe959 0%,
+    #49afe900 100%
+  );
+  --color-brand-border-blue-gradient: linear-gradient(272.09deg, #49afe9 3.53%, #8fd7ff 100%);
+  --color-brand-blue-icon-gradient: radial-gradient(
+    39.89% 976.52% at 29.48% 66.63%,
+    #49afe9 0%,
+    #8fd7ff 100%
+  );
+}
+
+.yellow-text-gradient {
+  -webkit-text-fill-color: transparent;
+  background: linear-gradient(117deg, #ffd37f 33.55%, #d6971e 70.76%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+.blue-text-gradient {
+  -webkit-text-fill-color: transparent;
+  background: radial-gradient(39.89% 976.52% at 29.48% 66.63%, #49afe9 0%, #8fd7ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+.green-text-gradient {
+  -webkit-text-fill-color: transparent;
+  background: linear-gradient(117deg, #8fffd6 33.55%, #30d69a 70.76%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+/* HTML: <div class="loader"></div> */
+.loader {
+  height: 4px;
+  width: 130px;
+  border-radius: 8px;
+  --c: no-repeat linear-gradient(#49afe9 0 0);
+  background: var(--c), var(--c), #49afe914;
+  background-size: 60% 100%;
+  animation: l16 3s infinite;
+}
+@keyframes l16 {
+  0% {
+    background-position: -150% 0, -150% 0;
+  }
+  66% {
+    background-position: 250% 0, -150% 0;
+  }
+  100% {
+    background-position: 250% 0, 250% 0;
   }
 }

@@ -38,8 +38,9 @@ export default function Home() {
 
   if (true) {
     return (
-      <div className="min-h-screen bg-gray-700 flex items-center justify-center">
-        <p className="text-primary text-lg font-semibold">Loading...</p>
+      <div className="w-full min-h-screen space-y-4 flex flex-col items-center justify-center bg-brand-background-1 text-white">
+        <div className="loader"></div>
+        <p className="text-primary text-sm font-medium">Loading Fantasy</p>
       </div>
     );
   }

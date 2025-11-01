@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { IBM_Plex_Sans } from "next/font/google";
 import "./globals.css";
 import { TonProvider } from "@/providers/ton-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
@@ -7,10 +7,10 @@ import TanstackProviders from "./tanstack-providers";
 import { Toaster } from "@/components/ui/sonner";
 
 // Configure Fredoka font
-const inter = Inter({
+const ibm = IBM_Plex_Sans({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
-  variable: "--font-inter",
+  variable: "--font-ibm",
   display: "swap",
 });
 
@@ -29,7 +29,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} overflow-x-hidden antialiased`}>
+      <body className={`${ibm.className} overflow-x-hidden antialiased`}>
         <TanstackProviders>
           <ThemeProvider
             attribute="class"
