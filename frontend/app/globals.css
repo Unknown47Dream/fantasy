@@ -210,7 +210,7 @@
   border-radius: 8px;
   --c: no-repeat linear-gradient(#49afe9 0 0);
   background: var(--c), var(--c), #49afe914;
-  background-size: 60% 100%;
+  background-size: 55% 100%;
   animation: l16 3s infinite;
 }
 @keyframes l16 {
