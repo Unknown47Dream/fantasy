@@ -101,7 +101,7 @@ export function BottomNav({ currentPage, onPageChange }: BottomNavProps) {
 
   return (
     <div
-      className="bg-brand-background-3 grid grid-cols-5 pt-1"
+      className="bg-brand-background-3 grid grid-cols-5 pt-1 rounded-tr-[12px] rounded-tl-[12px]"
       style={{
         paddingBottom: `${safeAreaInsetBottom + 4}px`,
       }}

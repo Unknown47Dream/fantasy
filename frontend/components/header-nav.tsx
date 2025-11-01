@@ -15,7 +15,7 @@ export function HeaderNav({ user }: HeaderNavProps) {
 
   return (
     <div
-      className="grid grid-cols-5 pb-2 px-2"
+      className="grid grid-cols-5 pb-2 px-6"
       style={{
         paddingTop: `${safeAreaInsetTop + 8}px`,
       }}
@@ -23,8 +23,8 @@ export function HeaderNav({ user }: HeaderNavProps) {
       <Image
         src={user.user.photo_url}
         alt={user.user.first_name}
-        width={32}
-        height={32}
+        width={36}
+        height={36}
         className="object-cover rounded-full"
       />
     </div>
