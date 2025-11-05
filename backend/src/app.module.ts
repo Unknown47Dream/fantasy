@@ -11,6 +11,8 @@ import { AxiosInstance, default as axios } from 'axios';
 import { HttpService } from '@nestjs/axios';
 import { PrismaModule } from './prisma/prisma.module';
 // import { ThrottlerBehindProxyGuard } from './common/guards/throttler-behind-proxy.guard';
+import { GridController } from './grid/grid.controller';
+import { GridModule } from './grid/grid.module';
 
 const cacheable = new CacheableLookup({
   maxTtl: 3600,
@@ -39,6 +41,8 @@ cacheable.install(httpsAgent);
         JWT_SECRET: Joi.string().required(),
         JWT_REFRESH_SECRET: Joi.string().required(),
         FRONTEND_URL: Joi.string().required(),
+        GRID_CENTRAL_GQL: Joi.string().required(),
+        GRID_API_KEY: Joi.string().required(),
       }),
     }),
     ThrottlerModule.forRoot([
@@ -61,8 +65,9 @@ cacheable.install(httpsAgent);
     PrismaModule,
     UsersModule,
     AuthModule,
+    GridModule,
   ],
-  controllers: [],
+  controllers: [GridController],
   providers: [
     {
       provide: APP_GUARD,
