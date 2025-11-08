@@ -5,26 +5,13 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import * as Joi from 'joi';
-import CacheableLookup from 'cacheable-lookup';
-import * as https from 'https';
 import { AxiosInstance, default as axios } from 'axios';
 import { HttpService } from '@nestjs/axios';
 import { PrismaModule } from './prisma/prisma.module';
+import CacheableLookup from 'cacheable-lookup';
+import { Agent as HttpsAgent } from 'https'; // Node.js HTTPS agent
+import { Agent as HttpAgent } from 'http'; // Node.js HTTP agent
 // import { ThrottlerBehindProxyGuard } from './common/guards/throttler-behind-proxy.guard';
-import { GridController } from './grid/grid.controller';
-import { GridModule } from './grid/grid.module';
-
-const cacheable = new CacheableLookup({
-  maxTtl: 3600,
-  errorTtl: 30,
-});
-const agentOptions = {
-  keepAlive: true,
-  keepAliveMsecs: 5000,
-  maxSockets: 10,
-};
-const httpsAgent = new https.Agent(agentOptions);
-cacheable.install(httpsAgent);
 
 @Module({
   imports: [
@@ -65,9 +52,8 @@ cacheable.install(httpsAgent);
     PrismaModule,
     UsersModule,
     AuthModule,
-    GridModule,
   ],
-  controllers: [GridController],
+  controllers: [],
   providers: [
     {
       provide: APP_GUARD,
@@ -78,14 +64,23 @@ cacheable.install(httpsAgent);
       provide: 'PANDA_HTTP',
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
+        const cacheableLookup = new CacheableLookup({
+          cache: new Map(),
+          maxTtl: 900, // 15 minutes maximum cache
+        });
+        const httpsAgent = new HttpsAgent();
+        const httpAgent = new HttpAgent();
+        cacheableLookup.install(httpsAgent);
+        cacheableLookup.install(httpAgent);
+
         const instance: AxiosInstance = axios.create({
           baseURL: configService.get<string>('BASE_API_URL'),
           headers: {
             Authorization: `Bearer ${configService.get<string>('PANDA_SCORE_MAIN_API_TOKEN')}`,
             'Content-Type': 'application/json',
           },
+          httpAgent,
           httpsAgent,
-          timeout: 30000,
         });
         return new HttpService(instance);
       },

@@ -43,48 +43,81 @@ enum AdminRole {
 }
 
 model User {
-  id                      String     @id @default(cuid()) @db.VarChar(128)
-  telegramId              String     @unique @db.VarChar(255)
-  username                String?    @db.VarChar(255)
-  firstName               String?    @db.VarChar(255)
-  lastName                String?    @db.VarChar(255)
-  photoUrl                String?    @db.Text
-  languageCode            String?    @db.VarChar(10)
-  isPremium               Boolean    @default(false)
-  points                  Int        @default(0)
+  id                      String            @id @default(cuid()) @db.VarChar(128)
+  telegramId              String            @unique @db.VarChar(255)
+  username                String?           @db.VarChar(255)
+  firstName               String?           @db.VarChar(255)
+  lastName                String?           @db.VarChar(255)
+  email                   String?           @db.VarChar(255)
+  nickname                String?           @db.VarChar(255)
+  bio                     String?           @db.VarChar(255)
+  photoUrl                String?           @db.Text
+  languageCode            String?           @db.VarChar(10)
+  isPremium               Boolean           @default(false)
+  points                  Int               @default(0)
   pointsHistory           PointsHistory[]
-  xp                      Int        @default(0)
+  xp                      Int               @default(0)
   xpHistory               XpHistory[]
   tasks                   UserTask[]
   // Referral system (Self-relation)
-  referralCode            String     @unique @db.VarChar(50)
-  referralCount           Int        @default(0)
-  referredById            String?    @db.VarChar(128)
-  referredBy              User?      @relation("UserReferrals", fields: [referredById], references: [id], onDelete: SetNull)
-  referrals               User[]     @relation("UserReferrals")
-  referralsMade           Referral[] @relation("ReferrerReferrals")
-  referralsReceived       Referral[] @relation("ReferredReferrals")
+  referralCode            String            @unique @db.VarChar(50)
+  referralCount           Int               @default(0)
+  referredById            String?           @db.VarChar(128)
+  referredBy              User?             @relation("UserReferrals", fields: [referredById], references: [id], onDelete: SetNull)
+  referrals               User[]            @relation("UserReferrals")
+  referralsMade           Referral[]        @relation("ReferrerReferrals")
+  referralsReceived       Referral[]        @relation("ReferredReferrals")
   // purchases
   purchases               Purchase[]
   // Points history
   // Daily bonus
   lastDailyClaimAt        DateTime?
-  dailyStreak             Int        @default(0)
+  dailyStreak             Int               @default(0)
   // Airdrop wallet
-  walletAddress           String?    @db.VarChar(255)
+  walletAddress           String?           @db.VarChar(255)
   walletConnectedAt       DateTime?
   // Payment wallet (TON Connect)
-  paymentWalletAddress    String?    @db.VarChar(255)
-  paymentWalletVerified   Boolean    @default(false)
+  paymentWalletAddress    String?           @db.VarChar(255)
+  paymentWalletVerified   Boolean           @default(false)
   paymentWalletVerifiedAt DateTime?
-  createdAt               DateTime   @default(now())
-  updatedAt               DateTime   @default(now()) @updatedAt
+  achievements            UserAchievement[]
+  userOrbs                UserOrb[]
+  birthday                DateTime?
+  createdAt               DateTime          @default(now())
+  updatedAt               DateTime          @default(now()) @updatedAt
 
   @@index([telegramId], name: "user_telegram_id_idx")
   @@index([referralCode], name: "user_referral_code_idx")
   @@index([points(sort: Desc), createdAt(sort: Asc)], name: "user_leaderboard_idx")
   @@index([paymentWalletAddress], name: "user_payment_wallet_idx")
   @@map("users")
+}
+
+model UserAchievement {
+  id            String      @id @default(cuid()) @db.VarChar(128)
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
+  achievementId String
+  achievement   Achievement @relation(fields: [achievementId], references: [id])
+  completed     Boolean     @default(false)
+  completedAt   DateTime?
+
+  @@unique([userId, achievementId])
+  @@index([userId], name: "user_achievement_user_idx")
+  @@index([achievementId], name: "user_achievement_achievement_idx")
+  @@index([completed], name: "user_achievement_completed_idx")
+  @@map("user_achievements")
+}
+
+model Achievement {
+  id              String            @id @default(cuid()) @db.VarChar(128)
+  name            String
+  description     String
+  reward          Int
+  userAchievement UserAchievement[]
+
+  @@index([id], name: "achievement_id_idx")
+  @@map("achievements")
 }
 
 model XpHistory {
@@ -114,6 +147,35 @@ enum XpType {
   ADMIN_ADJUSTMENT
 }
 
+model UserOrb {
+  id     String @id @default(cuid()) @db.VarChar(128)
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+  orbId  String
+  orb    Orb    @relation(fields: [orbId], references: [id])
+  amount Int
+
+  @@unique([userId, orbId])
+  @@index([userId], name: "user_orb_user_idx")
+  @@index([orbId], name: "user_orb_orb_idx")
+  @@map("user_orbs")
+}
+
+model Orb {
+  id          String    @id @default(cuid()) @db.VarChar(128)
+  userOrbs    UserOrb[]
+  image_url   String
+  rarity      Int
+  price       Int
+  attribute   String
+  name        String
+  description String    @db.VarChar(500)
+
+  @@index([id], name: "orb_id_idx")
+  @@index([name], name: "orb_name_idx")
+  @@map("orbs")
+}
+
 model PointsHistory {
   id          String     @id @default(cuid()) @db.VarChar(128)
   userId      String     @db.VarChar(128)
@@ -133,6 +195,7 @@ enum PointsType {
   DAILY
   REFERRAL
   TASK_COMPLETION
+  ACHIEVEMENT_COMPLETION
   PURCHASE
   BONUS
   ADMIN_ADJUSTMENT
